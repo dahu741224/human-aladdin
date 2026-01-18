@@ -1,0 +1,5 @@
+{
+  "name": "Human Aladdin",
+  "description": "A sophisticated Decision Guardrail System designed to identify risks, define forbidden actions, and preserve human agency through disciplined phase assessment and safe action radii.",
+  "requestFramePermissions": []
+}
