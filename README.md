@@ -1,20 +1,23 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Human Aladdin
 
-# Run and deploy your AI Studio app
+Human Aladdin 是一套「決策護欄系統」。
 
-This contains everything you need to run your app locally.
+它不預測、不下指令、不告訴你該怎麼做，
+只在錯誤變成不可逆之前，標示風險邊界。
 
-View your app in AI Studio: https://ai.studio/apps/drive/1c94EXEJ3NR-RgPvc5vpoxGzLwYzDQ9iK
+---
 
-## Run Locally
+## 🧠 核心理念
 
-**Prerequisites:**  Node.js
+- 不操控人
+- 不製造恐懼
+- 不預言未來
+- 只揭示「現在不能做什麼」
 
+---
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🚀 如何在本地端啟動
+
+### 1️⃣ 安裝依賴
+```bash
+npm install
