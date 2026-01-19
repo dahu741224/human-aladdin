@@ -21,3 +21,9 @@ Human Aladdin 是一套「決策護欄系統」。
 ### 1️⃣ 安裝依賴
 ```bash
 npm install
+2️⃣ 設定環境變數（Gemini API Key）
+
+把 `.env.example` 複製成 `.env.local`，再填入你的 key：
+
+```bash
+cp .env.example .env.local
