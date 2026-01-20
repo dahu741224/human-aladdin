@@ -315,16 +315,22 @@ const App: React.FC = () => {
         {step === 3 && renderResult()}
       </main>
 
-      <footer className="fixed bottom-0 w-full glass-panel border-t border-white/5 py-4 px-8 z-50">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-500 uppercase tracking-[0.2em] gap-4 font-bold">
-            <span className="text-center opacity-70">Human Aladdin 僅提供風險與狀態提示，不構成預測或建議。</span>
-            <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span>系統狀態：核心護欄運行中</span>
-            </div>
-            <span className="text-amber-600">所有決定仍由你自行判斷與承擔</span>
-        </div>
-      </footer>
+     <footer
+  aria-hidden="true"
+  className="fixed bottom-0 w-full glass-panel border-t border-white/5 py-4 px-8 z-50 pointer-events-none"
+>
+  <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-500 uppercase tracking-[0.2em] gap-4 font-bold">
+    <span className="text-center opacity-70">
+      Human Aladdin 僅提供風險與狀態提示，不構成預測或建議。
+    </span>
+    <div className="flex items-center gap-3">
+      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+      <span>系統狀態：核心護欄運行中</span>
+    </div>
+    <span className="text-amber-600">所有決定仍由你自行判斷與承擔</span>
+  </div>
+</footer>
+
     </div>
   );
 };
