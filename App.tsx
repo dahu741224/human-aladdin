@@ -1,14 +1,13 @@
-
 import React, { useState } from 'react';
 import { analyzeSituation } from './geminiService';
 import { AladdinAnalysis, RiskCategory } from './types';
 import AnalysisDisplay from './components/AnalysisDisplay';
-import { 
-  Loader2, 
-  Sparkles, 
-  ShieldCheck, 
-  Briefcase, 
-  TrendingUp, 
+import {
+  Loader2,
+  Sparkles,
+  ShieldCheck,
+  Briefcase,
+  TrendingUp,
   Heart,
   ArrowRight,
   ChevronLeft
@@ -35,21 +34,32 @@ const App: React.FC = () => {
   };
 
   const handleInputChange = (field: string, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev: any) => ({ ...prev, [field]: value }));
   };
 
   const handleAnalyze = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!category) return;
+
+    // ✅ DEBUG：確認「form submit」是否真的有觸發
+    alert('✅ 已觸發 handleAnalyze（表單 submit 有進來）');
+
+    if (!category) {
+      alert('⚠️ category 為空（沒有選類別）');
+      return;
+    }
 
     setIsAnalyzing(true);
     setError(null);
+
     try {
       const data = await analyzeSituation(category, formData);
       setResult(data);
       setStep(3);
     } catch (err: any) {
-      setError(err.message || "風險護欄系統遭遇內部錯誤。");
+      console.error('analyzeSituation error:', err);
+      setError(err?.message || '風險護欄系統遭遇內部錯誤。');
+      // ✅ DEBUG：確認是否是 API 呼叫失敗
+      alert(`⚠️ analyzeSituation 發生錯誤：${err?.message || '未知錯誤'}`);
     } finally {
       setIsAnalyzing(false);
     }
@@ -65,9 +75,9 @@ const App: React.FC = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          { icon: <ShieldCheck size={20} />, title: "不提供指令", desc: "保留您的自主權" },
-          { icon: <ShieldCheck size={20} />, title: "只標註懸崖", desc: "識別不可逆風險" },
-          { icon: <ShieldCheck size={20} />, title: "誠實分析", desc: "基於您的現狀描述" }
+          { icon: <ShieldCheck size={20} />, title: '不提供指令', desc: '保留您的自主權' },
+          { icon: <ShieldCheck size={20} />, title: '只標註懸崖', desc: '識別不可逆風險' },
+          { icon: <ShieldCheck size={20} />, title: '誠實分析', desc: '基於您的現狀描述' }
         ].map((item, i) => (
           <div key={i} className="glass-panel p-6 rounded-3xl border border-white/5 space-y-3">
             <div className="text-amber-500 mx-auto w-fit">{item.icon}</div>
@@ -76,7 +86,7 @@ const App: React.FC = () => {
           </div>
         ))}
       </div>
-      <button 
+      <button
         onClick={handleNextStep}
         className="group flex items-center gap-2 mx-auto px-10 py-5 bg-amber-500 hover:bg-amber-400 text-slate-900 rounded-full font-black tracking-widest transition-all hover:scale-105"
       >
@@ -93,9 +103,9 @@ const App: React.FC = () => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { id: 'business', icon: <Briefcase size={32} />, title: "商業經營", desc: "關於營運、現金流、成本、結構風險。" },
-          { id: 'investment', icon: <TrendingUp size={32} />, title: "投資倉位", desc: "關於資產比例、時間壓力、出局風險。" },
-          { id: 'life', icon: <Heart size={32} />, title: "個人決策", desc: "關於精力狀態、心理焦慮、可回收性。" }
+          { id: 'business', icon: <Briefcase size={32} />, title: '商業經營', desc: '關於營運、現金流、成本、結構風險。' },
+          { id: 'investment', icon: <TrendingUp size={32} />, title: '投資倉位', desc: '關於資產比例、時間壓力、出局風險。' },
+          { id: 'life', icon: <Heart size={32} />, title: '個人決策', desc: '關於精力狀態、心理焦慮、可回收性。' }
         ].map((cat) => (
           <button
             key={cat.id}
@@ -119,14 +129,24 @@ const App: React.FC = () => {
     return (
       <div className="max-w-2xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-500">
         <div className="flex items-center justify-between mb-8">
-            <button onClick={handlePrevStep} className="flex items-center gap-1 text-slate-500 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest">
-                <ChevronLeft size={16} /> 返回選擇
-            </button>
-            <div className="text-right">
-                <span className="text-[10px] text-amber-500 font-black uppercase tracking-widest">目前類別</span>
-                <h3 className="text-lg font-black text-white uppercase">{category}</h3>
-            </div>
+          <button
+            onClick={handlePrevStep}
+            className="flex items-center gap-1 text-slate-500 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest"
+          >
+            <ChevronLeft size={16} /> 返回選擇
+          </button>
+          <div className="text-right">
+            <span className="text-[10px] text-amber-500 font-black uppercase tracking-widest">目前類別</span>
+            <h3 className="text-lg font-black text-white uppercase">{category}</h3>
+          </div>
         </div>
+
+        {/* ✅ 如果有錯誤，顯示在表單上方 */}
+        {error && (
+          <div className="glass-panel border border-red-500/30 bg-red-500/5 p-4 rounded-2xl text-red-200 text-sm">
+            ⚠️ {error}
+          </div>
+        )}
 
         <form onSubmit={handleAnalyze} className="glass-panel p-8 md:p-12 rounded-[40px] border border-white/5 space-y-8">
           <div className="space-y-6">
@@ -135,36 +155,62 @@ const App: React.FC = () => {
                 <div className="space-y-4">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">每月平均營收與趨勢</label>
                   <div className="grid grid-cols-2 gap-4">
-                    <input type="number" placeholder="平均月營收" className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('avg_revenue', e.target.value)} />
-                    <select className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('revenue_trend', e.target.value)}>
-                        <option value="">營收趨勢</option>
-                        <option value="上升">上升</option>
-                        <option value="持平">持平</option>
-                        <option value="下降">下降</option>
+                    <input
+                      type="number"
+                      placeholder="平均月營收"
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('avg_revenue', e.target.value)}
+                    />
+                    <select
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('revenue_trend', e.target.value)}
+                    >
+                      <option value="">營收趨勢</option>
+                      <option value="上升">上升</option>
+                      <option value="持平">持平</option>
+                      <option value="下降">下降</option>
                     </select>
                   </div>
                 </div>
+
                 <div className="space-y-4">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">可用現金與續航力</label>
                   <div className="grid grid-cols-2 gap-4">
-                    <input type="number" placeholder="目前可用現金" className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('current_cash', e.target.value)} />
-                    <input type="number" placeholder="可支撐月數" className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('cash_runway', e.target.value)} />
+                    <input
+                      type="number"
+                      placeholder="目前可用現金"
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('current_cash', e.target.value)}
+                    />
+                    <input
+                      type="number"
+                      placeholder="可支撐月數"
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('cash_runway', e.target.value)}
+                    />
                   </div>
                 </div>
+
                 <div className="space-y-4">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">決策者精力與重要性</label>
                   <div className="grid grid-cols-2 gap-4">
-                    <select className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('energy', e.target.value)}>
-                        <option value="">精力狀態</option>
-                        <option value="充足">充足</option>
-                        <option value="緊繃">緊繃</option>
-                        <option value="過載">過載</option>
+                    <select
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('energy', e.target.value)}
+                    >
+                      <option value="">精力狀態</option>
+                      <option value="充足">充足</option>
+                      <option value="緊繃">緊繃</option>
+                      <option value="過載">過載</option>
                     </select>
-                    <select className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('importance', e.target.value)}>
-                        <option value="">重要度</option>
-                        <option value="低">低</option>
-                        <option value="中">中</option>
-                        <option value="高">高</option>
+                    <select
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('importance', e.target.value)}
+                    >
+                      <option value="">重要度</option>
+                      <option value="低">低</option>
+                      <option value="中">中</option>
+                      <option value="高">高</option>
                     </select>
                   </div>
                 </div>
@@ -176,23 +222,40 @@ const App: React.FC = () => {
                 <div className="space-y-4">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">資產比例與時間壓力</label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="number" placeholder="投入資金佔總資產 (%)" className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('asset_ratio', e.target.value)} />
-                    <input type="text" placeholder="這筆錢多久內一定要用？" className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('time_limit', e.target.value)} />
+                    <input
+                      type="number"
+                      placeholder="投入資金佔總資產 (%)"
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('asset_ratio', e.target.value)}
+                    />
+                    <input
+                      type="text"
+                      placeholder="這筆錢多久內一定要用？"
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('time_limit', e.target.value)}
+                    />
                   </div>
                 </div>
+
                 <div className="space-y-4">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">心理狀態</label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <select className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('emotional_impact', e.target.value)}>
-                        <option value="">是否影響情緒/睡眠？</option>
-                        <option value="是">是</option>
-                        <option value="否">否</option>
+                    <select
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('emotional_impact', e.target.value)}
+                    >
+                      <option value="">是否影響情緒/睡眠？</option>
+                      <option value="是">是</option>
+                      <option value="否">否</option>
                     </select>
-                    <select className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('win_back_urgency', e.target.value)}>
-                        <option value="">多想把它「做回來」？ (1-5)</option>
-                        <option value="1">1 (不急)</option>
-                        <option value="3">3 (普通)</option>
-                        <option value="5">5 (極度焦慮)</option>
+                    <select
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('win_back_urgency', e.target.value)}
+                    >
+                      <option value="">多想把它「做回來」？ (1-5)</option>
+                      <option value="1">1 (不急)</option>
+                      <option value="3">3 (普通)</option>
+                      <option value="5">5 (極度焦慮)</option>
                     </select>
                   </div>
                 </div>
@@ -204,41 +267,54 @@ const App: React.FC = () => {
                 <div className="space-y-4">
                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">能量與壓力指標</label>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <select className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('sleep_quality', e.target.value)}>
-                        <option value="">睡眠品質</option>
-                        <option value="好">好</option>
-                        <option value="普通">普通</option>
-                        <option value="差">差</option>
+                    <select
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('sleep_quality', e.target.value)}
+                    >
+                      <option value="">睡眠品質</option>
+                      <option value="好">好</option>
+                      <option value="普通">普通</option>
+                      <option value="差">差</option>
                     </select>
-                    <select className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('urgency_feel', e.target.value)}>
-                        <option value="">現在不做就來不及？</option>
-                        <option value="是">是</option>
-                        <option value="否">否</option>
+                    <select
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('urgency_feel', e.target.value)}
+                    >
+                      <option value="">現在不做就來不及？</option>
+                      <option value="是">是</option>
+                      <option value="否">否</option>
                     </select>
                   </div>
                 </div>
+
                 <div className="space-y-4">
-                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">可回收性評估</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <select className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('has_retreat', e.target.value)}>
-                            <option value="">做錯是否有退路？</option>
-                            <option value="是">是</option>
-                            <option value="否">否</option>
-                        </select>
-                        <select className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50" onChange={(e) => handleInputChange('anxiety_level', e.target.value)}>
-                            <option value="">焦慮程度 (1-5)</option>
-                            <option value="1">1 (平靜)</option>
-                            <option value="3">3 (中等)</option>
-                            <option value="5">5 (極度焦慮)</option>
-                        </select>
-                    </div>
+                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">可回收性評估</label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <select
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('has_retreat', e.target.value)}
+                    >
+                      <option value="">做錯是否有退路？</option>
+                      <option value="是">是</option>
+                      <option value="否">否</option>
+                    </select>
+                    <select
+                      className="bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50"
+                      onChange={(e) => handleInputChange('anxiety_level', e.target.value)}
+                    >
+                      <option value="">焦慮程度 (1-5)</option>
+                      <option value="1">1 (平靜)</option>
+                      <option value="3">3 (中等)</option>
+                      <option value="5">5 (極度焦慮)</option>
+                    </select>
+                  </div>
                 </div>
               </>
             )}
 
             <div className="space-y-4">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">補充說明 (自由描述)</label>
-              <textarea 
+              <textarea
                 className="w-full h-32 bg-slate-900/50 border border-white/10 p-4 rounded-2xl text-white outline-none focus:ring-1 focus:ring-amber-500/50 resize-none"
                 placeholder="請誠實描述目前的具體狀況，這不是為了給 AI 看，是為了幫您整理思緒。"
                 onChange={(e) => handleInputChange('description', e.target.value)}
@@ -249,6 +325,8 @@ const App: React.FC = () => {
           <button
             type="submit"
             disabled={isAnalyzing}
+            // ✅ DEBUG：確認「click」事件有沒有真的進來
+            onClick={() => alert('✅ 已點到按鈕（click 有進來）')}
             className={`w-full flex items-center justify-center gap-2 py-5 rounded-3xl font-black tracking-widest transition-all ${
               isAnalyzing
                 ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
@@ -275,12 +353,15 @@ const App: React.FC = () => {
   const renderResult = () => (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
       <div className="flex items-center justify-between mb-8">
-        <button onClick={handlePrevStep} className="flex items-center gap-1 text-slate-500 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest">
-            <ChevronLeft size={16} /> 重新分析
+        <button
+          onClick={handlePrevStep}
+          className="flex items-center gap-1 text-slate-500 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest"
+        >
+          <ChevronLeft size={16} /> 重新分析
         </button>
         <div className="text-right">
-            <span className="text-[10px] text-amber-500 font-black uppercase tracking-widest">分析報告</span>
-            <h3 className="text-lg font-black text-white uppercase">{category} Risk Readout</h3>
+          <span className="text-[10px] text-amber-500 font-black uppercase tracking-widest">分析報告</span>
+          <h3 className="text-lg font-black text-white uppercase">{category} Risk Readout</h3>
         </div>
       </div>
       {result && <AnalysisDisplay analysis={result} />}
@@ -288,7 +369,7 @@ const App: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen pb-40 selection:bg-amber-500/30">
+    <div className="min-h-screen pb-72 selection:bg-amber-500/30">
       <nav className="sticky top-0 z-50 glass-panel border-b border-white/5 py-6 px-8 mb-12">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4">
@@ -315,22 +396,22 @@ const App: React.FC = () => {
         {step === 3 && renderResult()}
       </main>
 
-     <footer
-  aria-hidden="true"
-  className="fixed bottom-0 w-full glass-panel border-t border-white/5 py-4 px-8 z-50 pointer-events-none"
->
-  <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-500 uppercase tracking-[0.2em] gap-4 font-bold">
-    <span className="text-center opacity-70">
-      Human Aladdin 僅提供風險與狀態提示，不構成預測或建議。
-    </span>
-    <div className="flex items-center gap-3">
-      <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-      <span>系統狀態：核心護欄運行中</span>
-    </div>
-    <span className="text-amber-600">所有決定仍由你自行判斷與承擔</span>
-  </div>
-</footer>
-
+      {/* ✅ footer 不要擋點擊 */}
+      <footer
+        aria-hidden="true"
+        className="fixed bottom-0 w-full glass-panel border-t border-white/5 py-4 px-8 z-50 pointer-events-none"
+      >
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center text-[10px] text-slate-500 uppercase tracking-[0.2em] gap-4 font-bold">
+          <span className="text-center opacity-70">
+            Human Aladdin 僅提供風險與狀態提示，不構成預測或建議。
+          </span>
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span>系統狀態：核心護欄運行中</span>
+          </div>
+          <span className="text-amber-600">所有決定仍由你自行判斷與承擔</span>
+        </div>
+      </footer>
     </div>
   );
 };
